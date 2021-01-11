@@ -12,6 +12,13 @@ Param(
 if ($MyInvocation.InvocationName -ne '.') {
     Set-StrictMode -Version Latest
     $ErrorActionPreference = "Stop"
-    Move-ItemToArchiveDirByDate $ItemList
+    $ret = 0
+    try {
+        Move-ItemToArchiveDirByDate $ItemList
+    } catch {
+        $_
+        $ret = 1
+    }
     Wait-PressAnyKeyToContinue
+    exit $ret
 }

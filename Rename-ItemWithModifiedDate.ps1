@@ -10,6 +10,13 @@ Param([parameter(Mandatory,ValueFromRemainingArguments)][object[]]$ItemList)
 if ($MyInvocation.InvocationName -ne '.') {
     Set-StrictMode -Version Latest
     $ErrorActionPreference = "Stop"
-    Rename-ItemWithModifiedDate $ItemList
+    $ret = 0
+    try {
+        Rename-ItemWithModifiedDate $ItemList
+    } catch {
+        $_
+        $ret = 1
+    }
     Wait-PressAnyKeyToContinue
+    exit $ret
 }

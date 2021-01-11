@@ -106,19 +106,26 @@ function Test-ItemNamePrefixDate {
     $null -ne (Get-ItemNamePrefixDate $Item)
 }
 
-function Get-ItemArchiveParentDirectory {
+function Get-ItemParent {
     param($Item)
     If ($Item -is [System.IO.FileInfo]) {
-        $parentFullName = $Item.Directory.FullName
+        $Item.Directory
     } ElseIf ($Item -is [System.IO.DirectoryInfo]) {
-        $parentFullName = $Item.Parent.FullName
+        $Item.Parent
+    } else {
+        throw "期待しないタイプが与えられた: $($Item.GetType())"
     }
+}
+
+function Get-ItemArchiveParentDirectory {
+    param($Item)
+    $parentFullName = (Get-ItemParent $Item).FullName
     Get-ArchiveParentDir -ParentFullName $parentFullName
 }
 
 function Rename-ItemWithModifiedDate {
     param([parameter(Mandatory)][object[]]$ItemList)
-    <#
+<#
     .SYNOPSIS
     ファイル名先頭8文字に日付がなければファイル名の先頭に日付を加える。
 #>
@@ -184,6 +191,7 @@ function Move-ItemToArchiveDirByDate {
         Move-Item $Item -Destination $destDir
 
         # 移動元のフォルダが $ARCHIVE_DIR_NAME 配下で、アイテム数がゼロならディレクトリを消す
+        $parentFullName = (Get-ItemParent $Item).FullName
         if ((Test-DirHasArchive $parentFullName) -and ((Get-ChildItem $parentFullName | Measure-Object).Count -eq 0)) {
             Remove-Item -LiteralPath $parentFullName
         }
