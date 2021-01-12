@@ -143,7 +143,8 @@ function Rename-ItemWithModifiedDate {
         # 変更内容を出力する
         [String]$prefix = Get-Date -Date $item.LastWriteTime -Format "yyyyMMdd_"
         $newFilename = $prefix + $item.Name
-        $newFullname = Join-Path $item.Directory.FullName $newFilename
+        $parentFullname = Get-ItemParent $item
+        $newFullname = Join-Path $parentFullname.FullName $newFilename
         Write-Information "---"
         Write-Information "src: $($item.FullName)"
         Write-Information "dst: $newFullname"
